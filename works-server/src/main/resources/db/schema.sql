@@ -1,18 +1,16 @@
-CREATE TABLE public."comn_cd"
+create table public.comn_cd
 (
-    div_cd character varying(3) NOT NULL,
-    cd character varying(3) NOT NULL,
-    ko_nm character varying(50),
-    usg_yn character varying(1),
-    comments character varying(100),
-    reg_dt timestamp without time zone,
-    reg_usr_id character varying(10),
-    reg_ip character varying(16),
-    PRIMARY KEY (div_cd, cd)
-)
-    WITH (
-        OIDS = FALSE
-        );
+    div_cd     varchar(3) not null,
+    cd         varchar(3) not null,
+    ko_nm      varchar(50),
+    usg_yn     varchar(1),
+    comments   varchar(100),
+    reg_dt     timestamp,
+    reg_usr_id varchar(10),
+    reg_ip     varchar(16),
+    ord        integer,
+    primary key (div_cd, cd)
+);
 
 ALTER TABLE IF EXISTS public."comn_cd"
     OWNER to postgres;
