@@ -1,39 +1,66 @@
 package com.lewns2.worksserver.works.resource.repository;
 
+import com.lewns2.worksserver.works.resource.entity.QResource;
 import com.lewns2.worksserver.works.resource.entity.Resource;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 
 @Repository
-public interface ResourceRepository extends JpaRepository<Resource, String> {
+public class ResourceRepository {
 
-    @Query(value =
-            "SELECT r " +
-            "FROM resource r " +
-            "WHERE 1=1 " +
-            "AND r.comn_rst = :type " + // case : if type not null
-            "AND r.comn_ofb = :ofb " +  // case : if ofb not null
-            "AND r.comn_loc = :loc " + // case : if loc not null
-            "AND r.res_nm LIKE %:search%")
-    List<Resource> findAllResource(String type, String ofb, String loc, String search);
+    private JPAQueryFactory query;
+    private static final QResource r = QResource.resource;
 
-//    <if test="COMN_RST != ''">
-//    AND comn_rst = #{COMN_RST}
-//        </if>
-//        <if test="COMN_OFB != ''">
-//    AND comn_ofb = #{COMN_OFB}
-//        </if>
-//        <if test="COMN_LOC != ''">
-//    AND comn_loc = #{COMN_LOC}
-//        </if>
-//    AND res_nm LIKE '%'||#{KEYWORD}||'%'
-//    ORDER BY reg_dt DESC;
+    public ResourceRepository(JPAQueryFactory jpaQueryFactory) {
+        this.query = jpaQueryFactory;
+    }
 
+    public List<Resource> findAllResource(String type, String ofb, String loc, String search) {
 
+        List<Resource> findList = query.selectFrom(r)
+                .where(
+                        eqType(type),
+                        eqOfb(ofb),
+                        eqLoc(loc),
+                        containSearch(search)
+                )
+                .fetch();
+
+        return findList;
+    }
+
+    /* BooleanExpressions */
+    private BooleanExpression containSearch(String search) {
+        if(!StringUtils.hasText(search)) {
+            return null;
+        }
+
+        return r.res_nm.contains(search);
+    }
+    private BooleanExpression eqType(String type) {
+        if(type == "") {
+            return null;
+        }
+        return r.comn_rst.eq(type);
+    }
+
+    private BooleanExpression eqOfb(String ofb) {
+        if(ofb == "") {
+            return null;
+        }
+        return r.comn_ofb.eq(ofb);
+    }
+
+    private BooleanExpression eqLoc(String loc) {
+        if(loc == "") {
+            return null;
+        }
+        return r.comn_loc.eq(loc);
+    }
 }
+
