@@ -8,12 +8,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Repository
 public class ResourceRepository {
 
-    private JPAQueryFactory query;
+    private final JPAQueryFactory query;
     private static final QResource r = QResource.resource;
 
     public ResourceRepository(JPAQueryFactory jpaQueryFactory) {
@@ -43,21 +44,21 @@ public class ResourceRepository {
         return r.res_nm.contains(search);
     }
     private BooleanExpression eqType(String type) {
-        if(type == "") {
+        if(Objects.equals(type, "")) {
             return null;
         }
         return r.comn_rst.eq(type);
     }
 
     private BooleanExpression eqOfb(String ofb) {
-        if(ofb == "") {
+        if(Objects.equals(ofb, "")) {
             return null;
         }
         return r.comn_ofb.eq(ofb);
     }
 
     private BooleanExpression eqLoc(String loc) {
-        if(loc == "") {
+        if(Objects.equals(loc, "")) {
             return null;
         }
         return r.comn_loc.eq(loc);
